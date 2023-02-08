@@ -35,9 +35,13 @@ app.get('/campgrounds/new', (req, res) => {
 })
 
 app.post('/campgrounds', async (req, res) => {
-    const campground = new Campground(req.body.campground);
-    await campground.save()
-    res.redirect(`/campground/${campground._id}`)
+    try {
+        const campground = new Campground(req.body.campground);
+        await campground.save()
+        res.redirect(`/campground/${campground._id}`)
+    } catch (e) {
+        next(e)
+    }
 })
 
 app.get('/campgrounds/:id', async (req, res) => {
@@ -70,6 +74,10 @@ app.get('/makeCampground', async (req, res) => {
     })
     await camp.save()
     res.send(camp)
+})
+
+app.use((err, req, res, next) => {
+
 })
 
 app.listen(3000, () => {
