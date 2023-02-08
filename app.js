@@ -2,7 +2,9 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
-const ejsMate = require('ejs-mate')
+const ejsMate = require('ejs-mate');
+const catchAsync = require('./utils/catchAsync');
+const expressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 
@@ -25,56 +27,52 @@ app.get('/', (req, res) => {
     res.render('home')
 })
 
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find({});
     res.render('campgrounds/index', { campgrounds })
-})
+}))
 
 app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new')
 })
 
-app.post('/campgrounds', async (req, res) => {
-    try {
-        const campground = new Campground(req.body.campground);
-        await campground.save()
-        res.redirect(`/campground/${campground._id}`)
-    } catch (e) {
-        next(e)
-    }
-})
+app.post('/campgrounds', catchAsync(async (req, res) => {
+    const campground = new Campground(req.body.campground);
+    await campground.save()
+    res.redirect(`/campground/${campground._id}`)
+}))
 
-app.get('/campgrounds/:id', async (req, res) => {
+app.get('/campgrounds/:id', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render('campgrounds/show', { campground })
-})
+}))
 
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.Campground });
     res.redirect(`/campgrounds/${campground._id}`)
-})
+}))
 
-app.delete('/campgrounds/:id', async (req, res) => {
+app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     const campground = await Campground.findByIdAndDelete(id);
     res.redirect(`/campgrounds`)
-})
+}))
 
-app.get('/campgrounds/:id/edit', async (req, res) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render('campgrounds/edit', { campground })
-})
+}))
 
 
-app.get('/makeCampground', async (req, res) => {
+app.get('/makeCampground', catchAsync(async (req, res) => {
     const camp = new Campground({
         title: "My Backyard",
         description: "Cheap Camping"
     })
     await camp.save()
     res.send(camp)
-})
+}))
 
 app.use((err, req, res, next) => {
 
