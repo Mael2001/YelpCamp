@@ -78,8 +78,9 @@ app.get('/makeCampground', catchAsync(async (req, res) => {
 }))
 
 app.use((err, req, res, next) => {
-    const { message = 500, statusCode = 'Something went wrong' } = err;
-    res.status(statusCode).send(message)
+    const { statusCode = 500 } = err;
+    if(!err.message) err.message = 'Oh no, Something went wrong'
+    res.status(statusCode).render('error', { err })
 })
 
 app.all('*', (req, res, next) => {
