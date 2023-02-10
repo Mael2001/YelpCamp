@@ -106,15 +106,6 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
 }))
 
 
-app.get('/makeCampground', catchAsync(async (req, res) => {
-    const camp = new Campground({
-        title: "My Backyard",
-        description: "Cheap Camping"
-    })
-    await camp.save()
-    res.send(camp)
-}))
-
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
     if (!err.message) err.message = 'Oh no, Something went wrong'
