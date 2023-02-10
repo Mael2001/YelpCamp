@@ -3,14 +3,10 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const { reviewSchema } = require('./schemas.js')
-const catchAsync = require('./utils/catchAsync');
 const methodOverride = require('method-override');
-const Campground = require('./models/campground');
-const ExpressError = require('./utils/ExpressError');
-const Review = require('./models/review')
 
 const campgrounds = require('./routes/campgrounds')
+const reviews = require('./routes/reviews')
 
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
@@ -31,41 +27,13 @@ app.get('/', (req, res) => {
     res.render('home')
 })
 app.use('/campgrounds', campgrounds);
-
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    }
-    next();
-}
-
-app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findById(id);
-    const review = new Review(req.body.review);
-    console.log('review new')
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
-    const review = await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
+app.use('/campgrounds/:id/reviews', reviews);
 
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;
     if (!err.message) err.message = 'Oh no, Something went wrong'
     res.status(statusCode).render('error', { err })
 })
-
 
 app.listen(3000, () => {
     console.log('serving port 3000')
