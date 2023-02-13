@@ -9,7 +9,7 @@ router.get('/register', (req, res) => {
 })
 
 router.post('/register', catchAsync(async (req, res) => {
-    
+
 }))
 
 module.exports = router;
