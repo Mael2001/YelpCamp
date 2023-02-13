@@ -26,18 +26,23 @@ router.post('/register', catchAsync(async (req, res) => {
 }))
 
 router.get('/login', (req, res) => {
+    req.session.returnTo = req.session.returnTo
     res.render('users/login');
 })
 
 router.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
-    req.flash('success', 'Welcome Back!');
-    res.redirect('/campgrounds')
+    req.flash('success', 'welcome back!');
+    const redirectUrl = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo;
+    res.redirect(redirectUrl);
 })
 
 router.get('/logout', (req, res) => {
-    req.logOut();
-    req.flash('success', 'Successfully LogOut');
-    res.redirect('/camprgrounds')
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        req.flash('success', 'Successfully LogOut');
+        res.redirect('/campgrounds')
+    })
 })
 
 module.exports = router;
