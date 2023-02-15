@@ -24,11 +24,18 @@ const seedDB = async () => {
         await new Campground({
             author: '63ea9252f32c5a51c90b8e56',
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
+            geometry: {
+                type: "Point",
+                coordinates: [
+                    -113.1331,
+                    47.0202
+                ]
+            },
             title: `${sample(descriptors)} ${sample(places)}`,
             images: [
                 {
                     url: 'https://source.unsplash.com/collection/483251',
-                    filename:'Unsplash'
+                    filename: 'Unsplash'
                 },
                 {
                     url: 'https://res.cloudinary.com/dzyv9g3yh/image/upload/v1676487915/YelpCamp/daoxldarexkrlrqbqd2x.jpg',
