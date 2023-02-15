@@ -43,6 +43,15 @@
                         Looks good!
                     </div>
                 </div>
+                <div class="mb-3">
+                    <% campground.images.forEach(function(image, i){ %>
+                        <img src="<%=image.url%>" alt="" class="img-thumbnail">
+                        <div class="form-check-inline">
+                            <input type="checkbox" name="deleteImages[]" value="<%=image.filename%>" id="image-<%=i%>">
+                        </div>
+                        <label for="image-<%=i%>">Delete?</label>
+                    <% }) %>
+                </div>
                 <div class="d-grid gap-2 mx-auto mb-3">
                     <button class="btn btn-dark">Update Campground</button>
                     <a href="/campgrounds/<%= campground._id%>" class="btn btn-primary">Back to Campground</a>

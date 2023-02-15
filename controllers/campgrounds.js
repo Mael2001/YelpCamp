@@ -37,6 +37,7 @@ module.exports.renderCampground = catchAsync(async (req, res) => {
 
 module.exports.updateCampground = catchAsync(async (req, res) => {
     const { id } = req.params;
+    console.log(req.body)
     const campground = await Campground.findOneAndUpdate({ _id: id }, { ...req.body.campground });
     const newImgs = req.files.map(f => ({ url: f.path, filename: f.filename }));
     campground.images.push(...newImgs);
