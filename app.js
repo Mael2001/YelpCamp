@@ -19,9 +19,16 @@ const helmet = require('helmet');
 const userRoutes = require('./routes/users');
 const campgroundsRoutes = require('./routes/campgrounds');
 const reviewsRoutes = require('./routes/reviews');
+const connectionString = process.env.NODE_ENV !== "production" ?
+    'mongodb://localhost:27017/yelp-camp' :
+    process.env.DB_URL
+
+const MongoStore = require('connect-mongo');
+const MongoDBStore = require('connect-mongo')
 
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://localhost:27017/yelp-camp');
+//mongoose.connect(connectionString);
+mongoose.connect(connectionString);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -38,6 +45,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(mongoSanitize());
 
 const sessionConfig = {
+    store: MongoStore.create(
+        {
+            mongoUrl: connectionString,
+            secret: 'secret',
+            touchAfter: 24 * 3600
+        }).on('error', function (e) {
+            console.log(e)
+        }),
     name: 'yelpCampSession',
     secret: 'secret',
     resave: false,
